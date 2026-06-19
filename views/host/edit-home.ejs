@@ -1,0 +1,237 @@
+<%- include('../partials/head') %>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
+
+</head>
+
+<body class="bg-slate-100">
+
+<%- include('../partials/nav') %>
+
+<main class="py-12 px-4">
+
+  <div class="max-w-4xl mx-auto">
+
+
+<div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-rose-500 to-rose-600 text-white p-8">
+
+    <span class="inline-block px-3 py-1 text-xs font-semibold bg-white/20 rounded-full mb-4">
+      Property Management
+    </span>
+
+    <h1 class="text-4xl font-bold mb-2">
+      <% if (editing) { %>
+        Update Property
+      <% } else { %>
+        List Your Property
+      <% } %>
+    </h1>
+
+    <p class="text-rose-100">
+      <% if (editing) { %>
+        Make changes to your listing
+      <% } else { %>
+        Start earning by listing your home
+      <% } %>
+    </p>
+
+  </div>
+
+  <!-- Body -->
+  <div class="p-8">
+
+    <% if (editing && home.photo) { %>
+      <div class="mb-8">
+
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">
+          Current Photo
+        </h3>
+
+        <img
+          src="<%= home.photo %>"
+          alt="<%= home.homeName %>"
+          class="w-full h-72 object-cover rounded-xl border border-slate-200"
+        />
+
+      </div>
+    <% } %>
+
+    <form
+      action="<% if (editing) { %>/host/edit-home<% } else { %>/host/add-home<% } %>"
+      method="POST"
+      enctype="multipart/form-data"
+      class="space-y-6"
+    >
+
+      <input
+        type="hidden"
+        name="homeId"
+        value="<%= editing ? home._id : '' %>"
+      />
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Property Name -->
+        <div class="md:col-span-2">
+
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Property Name
+          </label>
+
+          <input
+            type="text"
+            id="homeName"
+            name="homeName"
+            value="<%= editing ? home.homeName : '' %>"
+            placeholder="Luxury Beachfront Villa"
+            required
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+          />
+
+        </div>
+
+        <!-- Location -->
+        <div>
+
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Location
+          </label>
+
+          <input
+            type="text"
+            id="location"
+            name="location"
+            value="<%= editing ? home.location : '' %>"
+            placeholder="Maldives"
+            required
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+          />
+
+        </div>
+
+        <!-- Price -->
+        <div>
+
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Price Per Night (₹)
+          </label>
+
+          <input
+            type="number"
+            id="price"
+            name="price"
+            value="<%= editing ? home.price : '' %>"
+            placeholder="5000"
+            min="1"
+            step="100"
+            required
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+          />
+
+        </div>
+
+        <!-- Rating -->
+        <div>
+
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Rating
+          </label>
+
+          <input
+            type="number"
+            id="rating"
+            name="rating"
+            value="<%= editing ? home.rating : '' %>"
+            placeholder="4.5"
+            min="0"
+            max="5"
+            step="0.1"
+            required
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+          />
+
+        </div>
+
+        <!-- Photo Upload -->
+        <div class="md:col-span-2">
+
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            <% if (editing) { %>
+              Update Photo
+            <% } else { %>
+              Upload Photo
+            <% } %>
+          </label>
+
+          <input
+            type="file"
+            id="photo"
+            name="photo"
+            accept="image/*"
+            <% if (!editing) { %>required<% } %>
+            class="w-full border border-slate-300 rounded-lg p-3"
+          />
+
+        </div>
+
+        <!-- Description -->
+        <div class="md:col-span-2">
+
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Description
+          </label>
+
+          <textarea
+            id="description"
+            name="description"
+            rows="6"
+            placeholder="Describe your property..."
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+          ><%= editing ? home.description : '' %></textarea>
+
+        </div>
+
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-end gap-4 pt-4">
+
+        <a
+          href="/host/host-home-list"
+          class="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-100 transition"
+        >
+          Cancel
+        </a>
+
+        <button
+          type="submit"
+          class="px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-semibold transition shadow-md"
+        >
+          <% if (editing) { %>
+            Save Changes
+          <% } else { %>
+            List Property
+          <% } %>
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+  </div>
+
+</main>
+
+</body>
+</html>

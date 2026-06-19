@@ -1,0 +1,246 @@
+<%- include('../partials/head') %>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
+
+</head>
+
+<body class="bg-slate-100">
+
+<%- include('../partials/nav') %>
+
+<main class="min-h-screen flex items-center justify-center px-4 py-12">
+
+  <div class="w-full max-w-2xl">
+
+
+<div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-rose-500 to-rose-600 text-white px-8 py-8">
+    <div class="text-center">
+      <h1 class="text-3xl font-bold mb-2">Join Airbnb</h1>
+      <p class="text-rose-100">
+        Create your account and start exploring amazing homes
+      </p>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="p-8">
+
+    <%- include('../partials/formsError') %>
+
+    <form action="/auth/signup" method="POST" class="space-y-5">
+
+      <!-- Name Fields -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            First Name
+          </label>
+
+          <input
+            type="text"
+            name="firstName"
+            value="<%= oldInput?.firstName || '' %>"
+            placeholder="John"
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Last Name
+          </label>
+
+          <input
+            type="text"
+            name="lastName"
+            value="<%= oldInput?.lastName || '' %>"
+            placeholder="Doe"
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+            required
+          />
+        </div>
+
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">
+          Email Address
+        </label>
+
+        <input
+          type="email"
+          name="email"
+          value="<%= oldInput?.email || '' %>"
+          placeholder="your.email@example.com"
+          class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+          required
+        />
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">
+          Password
+        </label>
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Create a strong password"
+          class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+          required
+        />
+      </div>
+
+      <!-- Confirm Password -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">
+          Confirm Password
+        </label>
+
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm your password"
+          class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none"
+          required
+        />
+      </div>
+
+      <!-- User Type -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-3">
+          What's your role?
+        </label>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <label id="guest-label"
+            class="flex items-center p-4 border-2 border-slate-300 rounded-xl cursor-pointer hover:border-rose-500 transition">
+
+            <input
+              type="radio"
+              name="userType"
+              value="guest"
+              <%= oldInput?.userType==='guest' ? 'checked' : '' %>
+            />
+
+            <div class="ml-3">
+              <p class="font-semibold text-slate-900">Guest</p>
+              <p class="text-sm text-slate-500">
+                Browse and book amazing homes
+              </p>
+            </div>
+
+          </label>
+
+          <label id="host-label"
+            class="flex items-center p-4 border-2 border-slate-300 rounded-xl cursor-pointer hover:border-rose-500 transition">
+
+            <input
+              type="radio"
+              name="userType"
+              value="host"
+              <%= oldInput?.userType==='host' ? 'checked' : '' %>
+            />
+
+            <div class="ml-3">
+              <p class="font-semibold text-slate-900">Host</p>
+              <p class="text-sm text-slate-500">
+                List your property and earn money
+              </p>
+            </div>
+
+          </label>
+
+        </div>
+      </div>
+
+      <!-- Terms -->
+      <label class="flex items-start gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+
+        <input
+          type="checkbox"
+          name="terms"
+          <%= oldInput?.terms ? 'checked' : '' %>
+          required
+        />
+
+        <span class="text-sm text-slate-600">
+          I agree to the
+          <a href="#" class="text-rose-600 font-semibold">
+            Terms of Service
+          </a>
+          and
+          <a href="#" class="text-rose-600 font-semibold">
+            Privacy Policy
+          </a>
+        </span>
+
+      </label>
+
+      <button
+        type="submit"
+        class="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-md hover:shadow-lg"
+      >
+        Create Account
+      </button>
+
+    </form>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="bg-slate-50 px-8 py-6 border-t border-slate-200 text-center">
+
+    <p class="text-slate-600">
+      Already have an account?
+
+      <a
+        href="/auth/login"
+        class="text-rose-600 font-semibold hover:text-rose-700"
+      >
+        Sign In
+      </a>
+    </p>
+
+  </div>
+
+</div>
+
+
+  </div>
+
+</main>
+
+<script>
+document.querySelectorAll('input[name="userType"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    document.querySelectorAll('[id$="-label"]').forEach(label => {
+      label.classList.remove('border-rose-500', 'bg-rose-50');
+      label.classList.add('border-slate-300');
+    });
+
+    if (this.checked) {
+      this.closest('label').classList.remove('border-slate-300');
+      this.closest('label').classList.add('border-rose-500', 'bg-rose-50');
+    }
+  });
+
+  if (radio.checked) {
+    radio.dispatchEvent(new Event('change'));
+  }
+});
+</script>
+
+</body>
+</html>

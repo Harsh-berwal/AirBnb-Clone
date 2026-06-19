@@ -1,0 +1,209 @@
+<%- include('../partials/head') %>
+
+</head>
+
+<body class="bg-slate-100 min-h-screen">
+
+<%- include('../partials/nav') %>
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- Breadcrumb -->
+
+  <div class="mb-8 text-sm">
+<a href="/" class="text-rose-600 hover:underline">
+  Home
+</a>
+
+<span class="mx-2">›</span>
+
+<a href="/homes" class="text-rose-600 hover:underline">
+  Properties
+</a>
+
+<span class="mx-2">›</span>
+
+<span class="text-slate-500">
+  <%= home.homeName %>
+</span>
+
+
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-10">
+
+
+<!-- LEFT -->
+<div class="lg:col-span-2">
+
+  <!-- Image -->
+  <div class="overflow-hidden rounded-2xl shadow-xl mb-8">
+
+    <img
+      src="<%= home.photo %>"
+      alt="<%= home.homeName %>"
+      onerror="this.src='https://placehold.co/1000x600?text=Property'"
+      class="w-full h-[500px] object-cover"
+    />
+
+  </div>
+
+  <!-- Title -->
+  <div class="mb-8">
+
+    <span class="inline-block bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-sm font-semibold mb-4">
+      Premium Property
+    </span>
+
+    <h1 class="text-5xl font-bold text-slate-900 mb-3">
+      <%= home.homeName %>
+    </h1>
+
+    <div class="flex items-center gap-4 text-slate-600">
+
+      <span>
+        📍 <%= home.location %>
+      </span>
+
+      <span class="font-semibold text-yellow-500">
+        ⭐ <%= home.rating %>
+      </span>
+
+    </div>
+
+  </div>
+
+  <!-- Description -->
+  <% if (home.description) { %>
+
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+
+      <h2 class="text-2xl font-bold text-slate-900 mb-4">
+        About This Property
+      </h2>
+
+      <p class="text-slate-700 leading-relaxed whitespace-pre-wrap">
+        <%= home.description %>
+      </p>
+
+    </div>
+
+  <% } %>
+
+  <!-- Property Info -->
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <div class="bg-white rounded-xl shadow p-6">
+
+      <p class="text-sm text-slate-500 mb-2">
+        Property Type
+      </p>
+
+      <p class="text-xl font-bold">
+        Premium Listing
+      </p>
+
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-6">
+
+      <p class="text-sm text-slate-500 mb-2">
+        Rating
+      </p>
+
+      <p class="text-xl font-bold text-yellow-500">
+        ⭐ <%= home.rating %>/5
+      </p>
+
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-6">
+
+      <p class="text-sm text-slate-500 mb-2">
+        Price / Night
+      </p>
+
+      <p class="text-xl font-bold text-rose-600">
+        ₹<%= home.price %>
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- RIGHT -->
+<div>
+
+  <div class="sticky top-24 bg-white rounded-2xl shadow-xl p-8">
+
+    <p class="text-sm text-slate-500 mb-2">
+      Price Per Night
+    </p>
+
+    <div class="mb-6">
+
+      <span class="text-5xl font-bold text-rose-600">
+        ₹<%= home.price %>
+      </span>
+
+      <span class="text-slate-500">
+        / night
+      </span>
+
+    </div>
+
+    <div class="border-t border-b py-4 mb-6 space-y-2">
+
+      <div class="flex justify-between">
+        <span>Base Price</span>
+        <span>₹<%= home.price %></span>
+      </div>
+
+      <div class="flex justify-between">
+        <span>Taxes & Fees</span>
+        <span>TBD</span>
+      </div>
+
+    </div>
+
+    <div class="flex justify-between items-center mb-6">
+
+      <span class="font-bold">
+        Total
+      </span>
+
+      <span class="text-2xl font-bold text-rose-600">
+        ₹<%= home.price %>
+      </span>
+
+    </div>
+
+    <!-- Buttons -->
+
+    <button
+      disabled
+      class="w-full bg-slate-300 text-slate-600 py-3 rounded-lg font-semibold mb-4 cursor-not-allowed"
+    >
+      Booking Coming Soon
+    </button>
+
+    <a
+      href="/homes"
+      class="block text-center border border-slate-300 py-3 rounded-lg hover:bg-slate-50 transition mb-4"
+    >
+      Continue Browsing
+    </a>
+
+    <%- include('../partials/favourite', { home: home }) %>
+
+  </div>
+
+</div>
+  </div>
+
+</main>
+
+</body>
+</html>

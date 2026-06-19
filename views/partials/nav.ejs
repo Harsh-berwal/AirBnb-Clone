@@ -1,0 +1,99 @@
+<header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+
+  <nav class="max-w-7xl mx-auto px-4">
+<div class="flex items-center justify-between h-16">
+
+  <!-- Logo -->
+  <a href="/" class="flex items-center gap-3">
+
+    <div class="w-10 h-10 rounded-lg bg-rose-600 flex items-center justify-center text-white text-xl">
+      ✈
+    </div>
+
+    <span class="hidden sm:block text-xl font-bold text-slate-900">
+      airbnb
+    </span>
+
+  </a>
+
+  <!-- Navigation -->
+  <div class="flex items-center gap-3">
+
+    <% if (isLoggedIn) { %>
+
+      <% if (user && (user.userType === 'guest' || user.role === 'guest')) { %>
+
+        <a
+          href="/homes"
+          class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
+        >
+          Homes
+        </a>
+
+        <a
+          href="/favourites"
+          class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
+        >
+          Favorites
+        </a>
+
+        <a
+          href="/bookings"
+          class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
+        >
+          Bookings
+        </a>
+
+      <% } else if (user && (user.userType === 'host' || user.role === 'host')) { %>
+
+        <a
+          href="/host/host-home-list"
+          class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
+        >
+          My Homes
+        </a>
+
+        <a
+          href="/host/add-home"
+          class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
+        >
+          Add Home
+        </a>
+
+      <% } %>
+
+      <form action="/auth/logout" method="POST">
+
+        <button
+          type="submit"
+          class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
+        >
+          Logout
+        </button>
+
+      </form>
+
+    <% } else { %>
+
+      <a
+        href="/auth/login"
+        class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
+      >
+        Login
+      </a>
+
+      <a
+        href="/auth/signup"
+        class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg transition"
+      >
+        Sign Up
+      </a>
+
+    <% } %>
+
+  </div>
+
+</div>
+  </nav>
+
+</header>

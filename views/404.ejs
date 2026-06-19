@@ -1,0 +1,52 @@
+<%- include('partials/head') %>
+  </head>
+  <body>
+    <%- include('partials/nav') %>
+    
+    <main class="min-h-screen flex items-center justify-center px-lg py-3xl">
+      <div class="container-custom max-w-md text-center animate-fade-in">
+        <!-- Error Code -->
+        <div class="mb-lg">
+          <div class="text-8xl font-bold text-accent-600 mb-md">404</div>
+          <h1 class="text-4xl font-bold text-slate-900 mb-md">Page Not Found</h1>
+          <p class="text-lg text-slate-600 mb-2xl">
+            Sorry, the page you're looking for doesn't exist. It might have been moved or deleted.
+          </p>
+        </div>
+
+        <!-- Illustration -->
+        <div class="mb-3xl text-6xl">🏠</div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-md justify-center">
+          <a
+            href="/"
+            class="btn-primary inline-flex justify-center"
+          >
+            <svg class="w-5 h-5 mr-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-2m-9-2l4 2m0-5L5 5m14 0l-7-4"></path>
+            </svg>
+            Back to Home
+          </a>
+          <a
+            href="/homes"
+            class="btn-outline inline-flex justify-center"
+          >
+            <svg class="w-5 h-5 mr-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            Browse Properties
+          </a>
+        </div>
+
+        <!-- Additional Help -->
+        <div class="mt-3xl pt-3xl border-t border-slate-200">
+          <p class="text-slate-600 mb-md">Need help?</p>
+          <a href="/" class="text-accent-600 font-semibold hover:text-accent-700 transition-colors duration-200">
+            Contact our support team
+          </a>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
