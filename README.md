@@ -98,7 +98,7 @@ The application was developed to gain practical experience in full-stack web dev
                           │
                           ▼
                       MongoDB
-
+```
 ## 📁 Project Structure
 
 ```text
