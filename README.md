@@ -21,6 +21,11 @@ The project combines a simple frontend built with **HTML, CSS, and JavaScript** 
 The application was developed to gain practical experience in full-stack web development, REST APIs, database management, authentication, authorization, middleware, and MVC architecture.
 
 ---
+## 📸 Screenshots
+
+### 🏠 Home Page
+
+![AirBnb Home Page](airbnb.png)
 
 ## ✨ Features
 
