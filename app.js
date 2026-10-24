@@ -10,7 +10,6 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
-const multer = require('multer');
 
 // Local Modules
 const storeRouter = require('./routes/storeRouter');
@@ -19,19 +18,20 @@ const authRouter = require('./routes/authRouter');
 
 const rootDir = require('./utils/pathUtil');
 const errorsController = require('./controllers/errors');
+const authMiddleware = require('./middleware/auth');
 
 const app = express();
 
 // Environment Variables
 const PORT = process.env.PORT || 3000;
 const DB_PATH = process.env.DB_PATH;
-const SESSION_SECRET = process.env.SESSION_SECRET;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'airbnb_session_fallback_secret';
 
-// View Engine
+// View Engine Setup
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-// Session Store
+// Session Store Configuration
 const store = new MongoDBStore({
   uri: DB_PATH,
   collection: 'sessions',
@@ -39,115 +39,73 @@ const store = new MongoDBStore({
 
 // Session Store Error Handling
 store.on('error', (error) => {
-  console.log('Session Store Error:', error);
+  console.error('Session Store Error:', error);
 });
 
-// Middleware
+// Body & Cookie Parsing Middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Random String Generator
-const randomString = {
-  generate(length) {
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(
-        Math.floor(Math.random() * characters.length)
-      );
-    }
-
-    return result;
-  },
-};
-
-// Multer Storage
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, 'uploads/');
-  },
-
-  filename(req, file, cb) {
-    const uniqueSuffix = randomString.generate(12);
-    cb(null, uniqueSuffix + '-' + file.originalname);
-  },
-});
-
-// File Filter
-const fileFilter = (req, file, cb) => {
-  if (
-    file.mimetype === 'image/jpeg' ||
-    file.mimetype === 'image/png'
-  ) {
-    cb(null, true);
-  } else {
-    cb(new Error('Invalid file type'), false);
-  }
-};
-
-app.use(
-  multer({
-    storage,
-    fileFilter,
-  }).single('photo')
-);
-
-// Static Files
+// Static Files Middleware
 app.use(express.static(path.join(rootDir, 'public')));
 app.use('/uploads', express.static(path.join(rootDir, 'uploads')));
 
-// Session Middleware
+// Session Middleware with Secure Cookie Configuration
 app.use(
   session({
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store,
+    cookie: {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    },
   })
 );
 
-// Custom Middleware
+// Populate Authentication State into Request and Response Locals
 app.use((req, res, next) => {
-  req.isLoggedIn = req.session.isLoggedIn;
-  req.user = req.session.user;
-  next();
-});
-
-app.use((req, res, next) => {
+  req.isLoggedIn = req.session ? !!req.session.isLoggedIn : false;
+  req.user = req.session ? req.session.user : null;
   res.locals.isLoggedIn = req.isLoggedIn;
   res.locals.user = req.user;
   next();
 });
 
-// Routes
+// Mount Routes
 app.use(storeRouter);
 app.use('/auth', authRouter);
 
-// Protected Routes
-app.use('/host', (req, res, next) => {
-  if (!req.isLoggedIn) {
-    return res.redirect('/auth/login');
-  }
+// Protected Host Routes with Role Authorization
+app.use(
+  '/host',
+  authMiddleware.isLoggedIn,
+  authMiddleware.isHost,
+  hostRouter
+);
 
-  next();
-});
-
-app.use('/host', hostRouter);
-
-// 404 Handler
+// 404 Catch-All Handler
 app.use(errorsController.pageNotFound);
 
-// Database Connection
-mongoose
-  .connect(DB_PATH)
-  .then(() => {
-    console.log('Connected to MongoDB');
+// Centralized 500 & Upload Error Handler
+app.use(errorsController.get500);
 
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+// Database Connection & Server Initialization
+if (process.env.NODE_ENV !== 'test') {
+  mongoose
+    .connect(DB_PATH)
+    .then(() => {
+      console.log('Connected to MongoDB');
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error('MongoDB Connection Error:', err.message);
     });
-  })
-  .catch((err) => {
-    console.log('MongoDB Connection Error:', err);
-  });
+}
+
+module.exports = app;

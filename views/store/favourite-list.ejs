@@ -63,7 +63,7 @@
 <!-- Grid -->
 <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-  <% favouriteHomes.forEach((home) => { %>
+  <% favouriteHomes.filter(Boolean).forEach((home) => { %>
 
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition duration-300">
 

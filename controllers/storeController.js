@@ -1,42 +1,42 @@
+const mongoose = require("mongoose");
 const Home = require("../models/home");
 const User = require("../models/users");
 
 const getSessionUserId = (req) => {
-  if (!req.session.user) {
+  if (!req.session || !req.session.user) {
     return null;
   }
-
-  return req.session.user.id || req.session.user._id || null;
+  return req.session.user._id || req.session.user.id || null;
 };
 
-exports.getIndex = (req, res, next) => {
-  Home.find()
-    .then((registeredHomes) => {
-      res.render("store/index", {
-        registeredHomes: registeredHomes,
-        pageTitle: "Home",
-        currentPage: "index",
-        user: req.session.user,
-      });
-    })
-    .catch((err) => {
-      console.error("Error fetching homes: ", err);
+exports.getIndex = async (req, res, next) => {
+  try {
+    const registeredHomes = await Home.find();
+    res.render("store/index", {
+      registeredHomes: registeredHomes || [],
+      pageTitle: "Home",
+      currentPage: "index",
+      isLoggedIn: req.isLoggedIn,
+      user: req.session ? req.session.user : null,
     });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.getHomes = (req, res, next) => {
-  Home.find()
-    .then((registeredHomes) => {
-      res.render("store/home-list", {
-        registeredHomes: registeredHomes,
-        pageTitle: "All Homes",
-        currentPage: "homes",
-        user: req.session.user,
-      });
-    })
-    .catch((err) => {
-      console.error("Error fetching homes: ", err);
+exports.getHomes = async (req, res, next) => {
+  try {
+    const registeredHomes = await Home.find();
+    res.render("store/home-list", {
+      registeredHomes: registeredHomes || [],
+      pageTitle: "All Homes",
+      currentPage: "homes",
+      isLoggedIn: req.isLoggedIn,
+      user: req.session ? req.session.user : null,
     });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.getBookings = (req, res, next) => {
@@ -44,97 +44,143 @@ exports.getBookings = (req, res, next) => {
     pageTitle: "My Bookings",
     currentPage: "bookings",
     isLoggedIn: req.isLoggedIn,
-    user: req.session.user,
+    user: req.session ? req.session.user : null,
   });
 };
 
-exports.getHomesDetails = (req, res, next) => {
-  const homeId = req.params.homeId;
-  Home.findById(homeId).then((home) => {
-    if (!home) {
-      res.redirect("/homes");
-    } else {
-      res.render("store/home-detail", {
-        pageTitle: "Home Details",
-        currentPage: "home",
-        home: home,
+exports.getHomesDetails = async (req, res, next) => {
+  try {
+    const homeId = req.params.homeId;
+
+    if (!mongoose.Types.ObjectId.isValid(homeId)) {
+      return res.status(404).render("404", {
+        pageTitle: "Home Not Found",
+        currentPage: "404",
         isLoggedIn: req.isLoggedIn,
-        user: req.session.user,
+        user: req.session ? req.session.user : null,
       });
     }
-  });
+
+    const home = await Home.findById(homeId);
+    if (!home) {
+      return res.status(404).render("404", {
+        pageTitle: "Home Not Found",
+        currentPage: "404",
+        isLoggedIn: req.isLoggedIn,
+        user: req.session ? req.session.user : null,
+      });
+    }
+
+    res.render("store/home-detail", {
+      pageTitle: home.homeName || "Home Details",
+      currentPage: "home",
+      home: home,
+      isLoggedIn: req.isLoggedIn,
+      user: req.session ? req.session.user : null,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.getFavouriteList = async (req, res, next) => {
-  const userId = getSessionUserId(req);
+  try {
+    const userId = getSessionUserId(req);
+    if (!userId) {
+      return res.redirect("/auth/login");
+    }
 
-  if (!userId) {
-    return res.redirect("/auth/login");
+    const user = await User.findById(userId).populate("favouriteHomes");
+    if (!user) {
+      return res.redirect("/auth/login");
+    }
+
+    // Filter out null or missing populated items to protect against crashes
+    const validFavourites = (user.favouriteHomes || []).filter(Boolean);
+
+    res.render("store/favourite-list", {
+      pageTitle: "My Favourites",
+      currentPage: "favourites",
+      favouriteHomes: validFavourites,
+      isLoggedIn: req.isLoggedIn,
+      user: req.session.user,
+    });
+  } catch (err) {
+    next(err);
   }
-
-  const user = await User.findById(userId).populate("favouriteHomes");
-
-  if (!user) {
-    return res.redirect("/auth/login");
-  }
-
-  res.render("store/favourite-list", {
-    pageTitle: "My Favourites",
-    currentPage: "favourites",
-    favouriteHomes: user.favouriteHomes || [],
-    isLoggedIn: req.isLoggedIn,
-    user: req.session.user,
-  });
 };
 
 exports.postAddToFavourite = async (req, res, next) => {
-  const homeId = req.body.homeId;
-  const userId = getSessionUserId(req);
-
-  if (!userId) {
-    return res.redirect("/auth/login");
-  }
-
-  const user = await User.findById(userId);
-
-  if (!user) {
-    return res.redirect("/auth/login");
-  }
-
-  const alreadyExists = user.favouriteHomes.some(
-    (id) => id.toString() === homeId,
-  );
-
-  if (!alreadyExists) {
-    const homeId = Array.isArray(req.body.homeId)
+  try {
+    const rawHomeId = Array.isArray(req.body.homeId)
       ? req.body.homeId[0]
       : req.body.homeId;
-    user.favouriteHomes.push(homeId);
-    await user.save();
-  }
 
-  res.redirect("/favourites");
+    if (!rawHomeId || !mongoose.Types.ObjectId.isValid(rawHomeId)) {
+      return res.redirect("/homes");
+    }
+
+    const homeId = rawHomeId.toString();
+    const userId = getSessionUserId(req);
+
+    if (!userId) {
+      return res.redirect("/auth/login");
+    }
+
+    const [user, homeExists] = await Promise.all([
+      User.findById(userId),
+      Home.findById(homeId),
+    ]);
+
+    if (!user) {
+      return res.redirect("/auth/login");
+    }
+
+    // Ensure the home actually exists before adding to favourites
+    if (!homeExists) {
+      return res.redirect("/homes");
+    }
+
+    const alreadyExists = user.favouriteHomes.some(
+      (id) => (id._id || id).toString() === homeId
+    );
+
+    if (!alreadyExists) {
+      user.favouriteHomes.push(homeId);
+      await user.save();
+    }
+
+    res.redirect("/favourites");
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.postRemoveFromFavourite = async (req, res, next) => {
-  const homeId = req.params.homeId;
-  const userId = getSessionUserId(req);
+  try {
+    const homeId = req.params.homeId;
+    const userId = getSessionUserId(req);
 
-  if (!userId) {
-    return res.redirect("/auth/login");
+    if (!userId) {
+      return res.redirect("/auth/login");
+    }
+
+    if (!homeId || !mongoose.Types.ObjectId.isValid(homeId)) {
+      return res.redirect("/favourites");
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.redirect("/auth/login");
+    }
+
+    user.favouriteHomes = (user.favouriteHomes || []).filter(
+      (id) => (id._id || id).toString() !== homeId.toString()
+    );
+
+    await user.save();
+    res.redirect("/favourites");
+  } catch (err) {
+    next(err);
   }
-
-  const user = await User.findById(userId);
-
-  if (!user) {
-    return res.redirect("/auth/login");
-  }
-
-  user.favouriteHomes = user.favouriteHomes.filter(
-    (id) => id.toString() !== homeId,
-  );
-
-  await user.save();
-
-  res.redirect("/favourites");
 };

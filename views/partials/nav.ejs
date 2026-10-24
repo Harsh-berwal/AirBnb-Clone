@@ -21,7 +21,30 @@
 
     <% if (isLoggedIn) { %>
 
-      <% if (user && (user.userType === 'guest' || user.role === 'guest')) { %>
+      <% if (user && (user.userType === 'host' || user.role === 'host')) { %>
+
+        <a
+          href="/homes"
+          class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
+        >
+          Explore
+        </a>
+
+        <a
+          href="/host/host-home-list"
+          class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
+        >
+          My Homes
+        </a>
+
+        <a
+          href="/host/add-home"
+          class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
+        >
+          Add Home
+        </a>
+
+      <% } else { %>
 
         <a
           href="/homes"
@@ -42,22 +65,6 @@
           class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
         >
           Bookings
-        </a>
-
-      <% } else if (user && (user.userType === 'host' || user.role === 'host')) { %>
-
-        <a
-          href="/host/host-home-list"
-          class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
-        >
-          My Homes
-        </a>
-
-        <a
-          href="/host/add-home"
-          class="px-3 py-2 rounded-lg hover:bg-slate-100 transition"
-        >
-          Add Home
         </a>
 
       <% } %>

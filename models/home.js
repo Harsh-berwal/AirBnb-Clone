@@ -6,9 +6,12 @@ const homeSchema = new mongoose.Schema({
   location: { type: String, required: true },
   rating: { type: Number, required: true },
   photo: { type: String },
-  description: { type: String }
-
- })
+  description: { type: String },
+  host: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+});
 
 //  homeSchema.pre('findOneAndDelete' , async function () {
 //   const homeId = this.getQuery()._id;
